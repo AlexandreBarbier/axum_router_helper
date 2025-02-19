@@ -1,6 +1,6 @@
 pub mod health;
 pub mod samples;
-use axum_router_helper::{
+use axum_rh::{
     load_routers,
     macros::{router_config, RouterHelper},
     router::traits::{ApiRouter, RouterHelper},

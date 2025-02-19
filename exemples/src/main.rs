@@ -1,6 +1,6 @@
 mod routes;
 use axum::serve;
-use axum_router_helper::router::traits::RouterHelper;
+use axum_rh::router::traits::RouterHelper;
 use routes::ExempleApiRouter;
 use tokio::net::TcpListener;
 

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 description = "A helper library for the axum router"
 license = "MIT"
-repository = "https://github.com/AlexandreBarbier/axum_router_helper"
+repository = "https://github.com/AlexandreBarbier/axum_rh"
 
 [features]
 default = ["base"]
