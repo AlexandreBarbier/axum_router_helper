@@ -1,0 +1,36 @@
+[package]
+name = "axum-router-helper"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["base"]
+full = ["base"]
+models = ["serde"]
+base = [
+    "models",
+    "macros",
+    "chrono",
+    "log",
+    "axum",
+    "tower-sessions",
+    "time",
+    "tower-sessions-redis-store",
+    "bcrypt",
+    "tokio",
+    "jsonwebtoken",
+]
+
+[dependencies]
+chrono = { version = "0.4.39", optional = true }
+serde = { version = "1.0.217", optional = true }
+log = { version = "0.4.25", features = ["kv"], optional = true }
+tokio = { version = "1.43.0", features = ["full"], optional = true }
+axum = { version = "0.8.1", features = ["default", "macros"], optional = true }
+tower-sessions = { version = "0.14.0", optional = true }
+time = { version = "0.3.37", optional = true }
+tower-sessions-redis-store = { version = "0.16.0", optional = true }
+bcrypt = { version = "0.17.0", optional = true }
+jsonwebtoken = { version = "9.3.1", optional = true }
+macros = { path = "src/router/macros", optional = true }
+cfg-if = "1.0.0"
