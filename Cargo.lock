@@ -129,17 +129,28 @@ name = "axum-router-helper"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "axum-router-helper-macros",
  "bcrypt",
  "cfg-if",
  "chrono",
  "jsonwebtoken",
  "log",
- "macros",
  "serde",
  "time",
  "tokio",
  "tower-sessions",
  "tower-sessions-redis-store",
+]
+
+[[package]]
+name = "axum-router-helper-macros"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "log",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -861,17 +872,6 @@ name = "log"
 version = "0.4.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04cbf5b083de1c7e0222a7a51dbfdba1cbe1c6ab0b15e29fff3f6c077fd9cd9f"
-
-[[package]]
-name = "macros"
-version = "0.1.0"
-dependencies = [
- "axum",
- "log",
- "proc-macro2",
- "quote",
- "syn",
-]
 
 [[package]]
 name = "matchit"
