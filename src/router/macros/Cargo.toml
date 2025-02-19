@@ -1,5 +1,5 @@
 [package]
-name = "axum-router-helper-macros"
+name = "arh-macros"
 version = "0.1.0"
 edition = "2021"
 description = "Macros for axum-router-helper"

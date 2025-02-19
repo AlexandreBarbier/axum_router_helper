@@ -39,6 +39,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "69f7f8c3906b62b754cd5326047894316021dcfe5a194c8ea52bdd94934a3457"
 
 [[package]]
+name = "arh-macros"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "log",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.86"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -125,11 +136,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "axum-router-helper"
+name = "axum-rh"
 version = "0.1.0"
 dependencies = [
+ "arh-macros",
  "axum",
- "axum-router-helper-macros",
  "bcrypt",
  "cfg-if",
  "chrono",
@@ -140,17 +151,6 @@ dependencies = [
  "tokio",
  "tower-sessions",
  "tower-sessions-redis-store",
-]
-
-[[package]]
-name = "axum-router-helper-macros"
-version = "0.1.0"
-dependencies = [
- "axum",
- "log",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
