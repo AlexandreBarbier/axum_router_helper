@@ -18,7 +18,7 @@ cfg_if::cfg_if! {
         pub mod middlewares;
         pub mod traits;
         pub mod utils;
-        pub use macros;
+        pub use axum_router_helper_macros;
         #[macro_export]
         macro_rules! load_routers {
         ($($router:ident), +) => {
