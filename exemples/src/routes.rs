@@ -1,5 +1,5 @@
 pub mod health;
-
+pub mod samples;
 use axum_router_helper::{
     load_routers,
     macros::{router_config, RouterHelper},
@@ -7,7 +7,11 @@ use axum_router_helper::{
 };
 
 use health::Health;
+use samples::Samples;
+// router_config((), Health) takes one required argument which is the state of the router.
+// All other arguments are optional and are the routers defined in their respective modules.
+// Have a look at the RouterConfiguration struct to understand the router_config macro.
 
 #[derive(RouterHelper)]
-#[router_config((), Health)]
+#[router_config((), Health, Samples)]
 pub struct ExempleApiRouter;
