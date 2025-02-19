@@ -1,13 +1,13 @@
 [package]
 name = "axum-rh"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "A helper library for the axum router"
 license = "MIT"
 repository = "https://github.com/AlexandreBarbier/axum_rh"
 
 [features]
-default = ["base"]
+default = ["models"]
 full = ["base"]
 models = ["serde"]
 base = [
