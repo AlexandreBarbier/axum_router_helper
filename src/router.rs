@@ -18,7 +18,9 @@ cfg_if::cfg_if! {
         pub mod middlewares;
         pub mod traits;
         pub mod utils;
+        pub mod logger;
         pub use arh_macros;
+
         #[macro_export]
         macro_rules! load_routers {
         ($($router:ident), +) => {

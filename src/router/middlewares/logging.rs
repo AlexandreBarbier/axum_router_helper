@@ -41,7 +41,6 @@ pub async fn logging_middleware(
     let res = next.run(req).await;
     let duration = start_time.elapsed();
     let status = res.status().as_u16();
-
     info!(status=status, method=method.to_string().as_str();
         "{} in {}ms",
         path,

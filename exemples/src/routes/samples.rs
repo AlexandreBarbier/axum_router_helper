@@ -1,10 +1,7 @@
 use axum::extract::Path;
 use axum_rh::{
     macros::{get, post, router},
-    router::{
-        models::{ApiResponse, Endpoint},
-        traits::ApiRouter,
-    },
+    router::models::ApiResponse,
 };
 use serde_json::json;
 pub struct Samples;

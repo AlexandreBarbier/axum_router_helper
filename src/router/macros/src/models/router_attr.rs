@@ -14,6 +14,7 @@ impl Default for RouterAttributes {
         }
     }
 }
+
 impl Parse for RouterAttributes {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut sc = Self::default();

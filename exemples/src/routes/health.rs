@@ -1,9 +1,6 @@
 use axum_rh::{
     macros::{get, router},
-    router::{
-        models::{ApiResponse, Endpoint},
-        traits::ApiRouter,
-    },
+    router::models::ApiResponse,
 };
 use serde_json::json;
 pub struct Health;

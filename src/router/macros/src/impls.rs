@@ -58,6 +58,8 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
     };
 
     let k: proc_macro2::TokenStream = quote!(
+        use axum_rh::router::models::Endpoint;
+        use axum_rh::router::traits::ApiRouter;
         #parsed_item
 
         impl ApiRouter<#state> for #struct_name {
@@ -81,10 +83,13 @@ pub fn router_helper_derive(input: ItemStruct) -> TokenStream {
     if res.is_err() {
         return res.unwrap_err().to_compile_error().into();
     }
+
     let res = res.unwrap();
     let state: syn::Type = res.state_type;
     let routers = res.routers;
     let expanded = quote! {
+        use axum_rh::router::traits::{ApiRouter, RouterHelper};
+
         impl RouterHelper<#state> for #struct_name {
             fn load_routers() -> axum::Router<#state> {
                 load_routers!(#(#routers),*)

@@ -3,7 +3,6 @@ pub mod samples;
 use axum_rh::{
     load_routers,
     macros::{router_config, RouterHelper},
-    router::traits::{ApiRouter, RouterHelper},
 };
 
 use health::Health;
