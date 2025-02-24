@@ -5,6 +5,7 @@ pub struct RouterConfiguration {
     pub state_type: syn::Type,
     pub routers: Vec<syn::Ident>,
 }
+
 impl Parse for RouterConfiguration {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let state_type: syn::Type = input.parse().expect("state is not a type");

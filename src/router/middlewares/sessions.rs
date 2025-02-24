@@ -13,8 +13,8 @@ pub async fn get_session_layer() -> (
         info!("REDIS_URL must be set");
     }
     let redis_url = env::var("REDIS_URL").unwrap_or("redis://localhost:6379".to_string());
-    let config = Config::from_url(&redis_url).unwrap();
-    let pool = Pool::new(config, None, None, None, 1).unwrap();
+    let config = Config::from_url(&redis_url).expect("cannot create config from url");
+    let pool = Pool::new(config, None, None, None, 1).expect("cannot create pool");
     let redis_conn = pool.connect();
     let _ = pool.wait_for_connect().await;
     let session_store = RedisStore::new(pool);

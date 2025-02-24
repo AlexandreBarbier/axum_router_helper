@@ -36,11 +36,20 @@ impl SessionObject {
     }
 
     async fn update_session(session: &Session, session_data: &SessionData) {
-        session
+       match session
             .insert(Self::OBJECT_KEY, session_data)
-            .await
-            .unwrap();
-        session.save().await.unwrap();
+            .await {
+            Ok(_) => {}
+            Err(e) => {
+                log::error!("Error updating session: {:?}", e);
+            }
+        };
+        match session.save().await {
+            Ok(_) => {}
+            Err(e) => {
+                log::error!("Error saving session: {:?}", e);
+            }
+        };
     }
 
     pub fn has_user_id(&self) -> bool {
@@ -69,7 +78,7 @@ where
         let mut data: SessionData = session
             .get(Self::OBJECT_KEY)
             .await
-            .unwrap()
+            .expect("session data not found")
             .unwrap_or_default();
         data.end_at = OffsetDateTime::now_utc();
         Self::update_session(&session, &data).await;

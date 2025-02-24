@@ -9,14 +9,14 @@ pub async fn auth_middleware(
     let token = match req
         .headers()
         .get(http::header::AUTHORIZATION)
-        .map(|h| h.to_str().unwrap().to_string())
+        .map(|h| h.to_str().unwrap_or_default().to_string())
     {
         Some(token) => token,
         None => {
             return axum::http::Response::builder()
                 .status(401)
                 .body(Body::empty())
-                .unwrap();
+                .expect("failed to build response");
         }
     };
     if session.has_user_id() {
@@ -34,7 +34,7 @@ pub async fn auth_middleware(
             return axum::http::Response::builder()
                 .status(401)
                 .body(Body::empty())
-                .unwrap();
+                .expect("failed to build response");
         }
     }
 

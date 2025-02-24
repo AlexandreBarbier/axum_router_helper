@@ -4,39 +4,59 @@ Axum router helper helps you build an API simply by using macros to define the r
 
 ## Install
 
+To add `axum-rh` to your project, run:
+
+```sh
 cargo add axum-rh
+```
 
 ## Middlewares
 
-All middlewares are optional and can be overriden by your own
+All middlewares are optional and can be overridden by your own implementations.
 
 ### Logging
 
-A simple logger middleware that can also send logs into betterstack (with the async feature)
-format request logs ```
+A simple logger middleware that can also send logs to Betterstack (with the async feature). It formats request logs.
+
+```rust
+use axum_rh::router::logger::init_logger;
+use axum_rh::router::middlewares;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    init_logger();
+    let tcp = TcpListener::bind(&"0.0.0.0:3005").await.unwrap();
+    let app = ExempleApiRouter::load_routers().layer(from_fn(
+            middlewares::logging::logging_middleware,
+        ));
+    serve(tcp, app.into_make_service()).await?;
+    Ok(())
+}
+```
 
 ### Sessions
 
-Use Redis storage to
+A default implementation of session management using Redis storage. This middleware will be updated to be more user-friendly in the future.
 
 ### Auth
 
-A default JWT authentication middleware
+A default JWT authentication middleware. The JWT token requires a `user_id` field. This middleware will also be updated to be more user-friendly in the future.
 
 ## How to:
 
-### Declare router
+### Declare Router
+
+To declare a router, use the `RouterHelper` derive macro and the `router_config` attribute to define the state type and router definitions.
 
 ```rust
-// base RouterHelper derive macros
-// the router_config define the state type (here is an empty state), Health and
-// Sample are routers definitions
 #[derive(RouterHelper)]
 #[router_config((), Health, Samples)]
 pub struct ExempleApiRouter;
 ```
 
-### Use states
+### Use States
+
+To use states in your router, define a state struct and include it in the `router_config` attribute.
 
 ```rust
 pub struct ApiState {
@@ -50,25 +70,24 @@ pub struct ExempleApiRouter;
 
 ### Declare Endpoints
 
-To declare an endpoint two macros are needed. The first one will be applied on the implementation of the module definition.
+To declare an endpoint, use two macros. The first macro is applied to the implementation of the module definition.
 
 ```rust
 pub struct Samples;
 
 #[router(base_path = "/samples")]
-impl Samples{
+impl Samples {
 
 }
 ```
 
-As you can see here it can take an optional argument `base_path` which will default to `/` if not set.
-The second one will be applied on each function definition under the struct impl
+The `base_path` argument is optional and defaults to `/` if not set. The second macro is applied to each function definition under the struct implementation.
 
 ```rust
 pub struct Samples;
 
 #[router(base_path = "/samples")]
-impl Samples{
+impl Samples {
     #[get("")]
     async fn get_samples() -> ApiResponse<serde_json::Value> {
         ...
@@ -76,30 +95,59 @@ impl Samples{
 }
 ```
 
-#### get
+#### HTTP Methods
 
-Define a get endpoint
+Define endpoints using the following macros:
 
-#### post
+- **GET**: Define a GET endpoint.
 
-Define a post endpoint
+  ```rust
+  #[get("")]
+  ```
 
-#### put
+- **POST**: Define a POST endpoint.
 
-Define a put endpoint
+  ```rust
+  #[post("")]
+  ```
 
-#### delete
+- **PUT**: Define a PUT endpoint.
 
-Define a delete endpoint
+  ```rust
+  #[put("")]
+  ```
 
-#### Return values
+- **DELETE**: Define a DELETE endpoint.
 
-The APIResponse struct define a default response type for our enpoints.
-You can use it or define your own response type as long as it implements into_response
+  ```rust
+  #[delete("")]
+  ```
+
+#### Return Values
+
+The `ApiResponse` struct defines a default response type for your endpoints. You can use it or define your own response type as long as it implements `IntoResponse`.
+
+```rust
+pub struct ApiResponse<T> {
+    pub status: StatusCode,
+    pub body: ResponseBody<T>,
+    pub error: bool,
+    pub headers: Option<Vec<(HeaderName, String)>>,
+}
+
+pub struct ResponseBody<T> {
+    #[serde(skip_serializing_if = "String::is_empty", default)]
+    pub error: String,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub data: Option<T>,
+}
+```
+
+Example:
 
 ```rust
 #[router(base_path = "/samples")]
-impl Samples{
+impl Samples {
     #[get("")]
     async fn get_samples() -> ApiResponse<serde_json::Value> {
         let samples: Vec<SampleData> = (0..10)

@@ -74,6 +74,7 @@ pub fn router_helper_derive(input: TokenStream) -> TokenStream {
 pub fn post(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
+
 /// Attribute macro to define a PUT route.
 /// # Arguments
 /// * `path` - the route path.
@@ -121,6 +122,7 @@ pub fn get(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn delete(_attr: TokenStream, item: TokenStream) -> TokenStream {
     item
 }
+
 /// Attribute macro to define a router configuration.
 /// # Arguments
 /// * `state` - Application state.
