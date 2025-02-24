@@ -38,7 +38,7 @@ impl<'kvs> VisitSource<'kvs> for LoggingVisitor {
                 self.user = Some(value.to_string());
             }
             "status" => {
-                self.status = Some(value.to_u64().unwrap() as u16);
+                self.status = Some(value.to_u64().unwrap_or_default() as u16);
             }
             "method" => {
                 self.method = Some(value.to_string());

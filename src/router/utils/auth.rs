@@ -20,7 +20,8 @@ pub fn hash_password(password: &str) -> Result<String, bcrypt::BcryptError> {
 }
 
 pub fn encode_jwt(user_id: String) -> Result<String, i32> {
-    let secret: String = "randomStringTypicallyFromEnv".to_string();
+    let secret: String =
+        std::env::var("JWT_SECRET").unwrap_or("randomStringTypicallyFromEnv".to_string());
     let now = Utc::now();
     let expire: chrono::TimeDelta = Duration::hours(24);
     let exp: usize = (now + expire).timestamp() as usize;
@@ -36,7 +37,7 @@ pub fn encode_jwt(user_id: String) -> Result<String, i32> {
 }
 
 pub fn decode_jwt(jwt_token: String) -> Result<TokenData<Claims>, i32> {
-    let secret = "randomStringTypicallyFromEnv".to_string();
+    let secret = std::env::var("JWT_SECRET").unwrap_or("randomStringTypicallyFromEnv".to_string());
     decode(
         &jwt_token,
         &DecodingKey::from_secret(secret.as_ref()),

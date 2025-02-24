@@ -39,7 +39,12 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
             };
             debug!(
                 "detected endpoint {}::{}",
-                parsed_item.self_ty.as_ref().span().source_text().unwrap(),
+                parsed_item
+                    .self_ty
+                    .as_ref()
+                    .span()
+                    .source_text()
+                    .unwrap_or_default(),
                 func.sig.ident.to_string()
             );
 
@@ -74,19 +79,20 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
 
 pub fn router_helper_derive(input: ItemStruct) -> TokenStream {
     let struct_name = &input.ident;
+    let router_config = match input.attrs[0].meta.require_list() {
+        Ok(v) => match v.parse_args::<RouterConfiguration>() {
+            Ok(rc) => rc,
+            Err(e) => {
+                return e.to_compile_error().into();
+            }
+        },
+        Err(e) => {
+            return e.to_compile_error().into();
+        }
+    };
 
-    let res = input.attrs[0]
-        .meta
-        .require_list()
-        .unwrap()
-        .parse_args::<RouterConfiguration>();
-    if res.is_err() {
-        return res.unwrap_err().to_compile_error().into();
-    }
-
-    let res = res.unwrap();
-    let state: syn::Type = res.state_type;
-    let routers = res.routers;
+    let state: syn::Type = router_config.state_type;
+    let routers = router_config.routers;
     let expanded = quote! {
         use axum_rh::router::traits::{ApiRouter, RouterHelper};
 

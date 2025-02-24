@@ -1,44 +1,34 @@
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct EndpointAttributes {
     pub path: String,
     pub auth: bool,
 }
 
-impl Default for EndpointAttributes {
-    fn default() -> Self {
-        Self {
-            path: "".to_string(),
-            auth: false,
-        }
-    }
-}
-
 impl Parse for EndpointAttributes {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let mut sc = Self::default();
+        let mut ep_attr = Self::default();
         while !input.is_empty() {
             if input.lookahead1().peek(syn::LitStr) {
                 let path: syn::LitStr = input.parse()?;
-                sc.path = path.value();
+                ep_attr.path = path.value();
             } else {
                 let ident: syn::Ident = input.parse()?;
                 match ident.to_string().as_str() {
                     "path" => {
                         let _: syn::Token![=] = input.parse()?;
                         let path: syn::LitStr = input.parse()?;
-                        sc.path = path.value();
+                        ep_attr.path = path.value();
                     }
                     "auth" => {
                         let _: syn::Token![=] = input.parse()?;
                         let auth: syn::LitBool = input.parse()?;
-                        sc.auth = auth.value;
+                        ep_attr.auth = auth.value;
                     }
                     _ => {
-                        let path: syn::LitStr = input.parse()?;
-                        sc.path = path.value();
+                        println!("Unknown attribute: {}", ident.to_string());
                     }
                 }
             }
@@ -46,7 +36,7 @@ impl Parse for EndpointAttributes {
                 input.parse::<syn::Token![,]>()?;
             }
         }
-        Ok(sc)
+        Ok(ep_attr)
     }
 }
 

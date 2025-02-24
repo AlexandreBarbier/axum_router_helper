@@ -79,7 +79,7 @@ where
 
         self.headers.map(|headers| {
             headers.into_iter().for_each(|(header, value)| {
-                new_headers.insert(header, value.parse().unwrap());
+                new_headers.insert(header, value.parse().expect("Invalid header value"));
             });
         });
         (self.status, new_headers, self.body).into_response()
