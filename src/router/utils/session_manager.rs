@@ -28,7 +28,7 @@ pub struct SessionObject {
 }
 
 impl SessionObject {
-    const OBJECT_KEY: &'static str = "data";
+    const DATA_KEY: &'static str = "data";
 
     pub async fn set_user_id(&mut self, user_id: String) {
         self.data.user_id = Some(user_id);
@@ -37,7 +37,7 @@ impl SessionObject {
 
     async fn update_session(session: &Session, session_data: &SessionData) {
        match session
-            .insert(Self::OBJECT_KEY, session_data)
+            .insert(Self::DATA_KEY, session_data)
             .await {
             Ok(_) => {}
             Err(e) => {
@@ -76,7 +76,7 @@ where
         let session = Session::from_request_parts(req, state).await?;
 
         let mut data: SessionData = session
-            .get(Self::OBJECT_KEY)
+            .get(Self::DATA_KEY)
             .await
             .expect("session data not found")
             .unwrap_or_default();

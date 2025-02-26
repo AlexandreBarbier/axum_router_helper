@@ -1,4 +1,5 @@
 use axum::extract::Path;
+use axum::http::HeaderMap;
 use axum_rh::{
     macros::{get, post, router},
     router::models::ApiResponse,
@@ -32,5 +33,21 @@ impl Samples {
             name: "Sample".to_string(),
         };
         ApiResponse::ok(Some(sample))
+    }
+
+    #[post("/{id}/header")]
+    async fn post_samples_header(Path(id): Path<i32>) -> ApiResponse<SampleData> {
+        let sample = SampleData {
+            id: id,
+            name: "Sample".to_string(),
+        };
+        let mut res = ApiResponse::ok(Some(sample));
+        res.headers = Some(HeaderMap::from_iter(vec![
+            (
+                axum::http::header::SET_COOKIE,
+                "session=; HttpOnly; Max-Age=0; Path=/".parse().unwrap(),
+            ),
+        ]));
+        res
     }
 }

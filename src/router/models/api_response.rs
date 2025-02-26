@@ -1,5 +1,5 @@
 pub use axum::{
-    http::{HeaderMap, HeaderName, StatusCode},
+    http::{HeaderMap, HeaderName, HeaderValue, StatusCode},
     response::IntoResponse,
     Json,
 };
@@ -12,7 +12,7 @@ pub struct ApiResponse<T> {
     pub status: StatusCode,
     pub body: ResponseBody<T>,
     pub error: bool,
-    pub headers: Option<Vec<(HeaderName, String)>>,
+    pub headers: Option<HeaderMap>,
 }
 
 impl<T> ApiResponse<T>
@@ -75,14 +75,12 @@ where
     T: Serialize + Default,
 {
     fn into_response(self) -> axum::response::Response {
-        let mut new_headers = HeaderMap::new();
-
-        self.headers.map(|headers| {
-            headers.into_iter().for_each(|(header, value)| {
-                new_headers.insert(header, value.parse().expect("Invalid header value"));
-            });
-        });
-        (self.status, new_headers, self.body).into_response()
+        (
+            self.status,
+            self.headers.unwrap_or(HeaderMap::new()),
+            self.body,
+        )
+            .into_response()
     }
 }
 
