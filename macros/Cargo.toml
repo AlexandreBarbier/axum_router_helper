@@ -1,6 +1,6 @@
 [package]
 name = "arh-macros"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "Macros for axum-router-helper"
 license = "MIT"
