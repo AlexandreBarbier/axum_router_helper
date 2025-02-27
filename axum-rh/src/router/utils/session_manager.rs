@@ -6,11 +6,31 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tower_sessions::Session;
 
-#[derive(Serialize, Deserialize, Debug)]
+
+pub trait SessionTrait: Send + Sync + Serialize + for<'de> Deserialize<'de> + Default {
+    fn key(&self) -> Option<String>;
+    fn set_key(&mut self, key: String);
+    fn has_key(&self) -> bool {
+        self.key().is_some()
+    }
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SessionData {
     pub user_id: Option<String>,
     pub created_at: OffsetDateTime,
     pub end_at: OffsetDateTime,
+}
+
+impl SessionTrait for SessionData {
+    fn key(&self) -> Option<String> {
+        self.user_id.clone()
+    }
+
+    fn set_key(&mut self, key: String) {
+        self.user_id = Some(key);
+    }
 }
 
 impl Default for SessionData {
@@ -22,20 +42,24 @@ impl Default for SessionData {
         }
     }
 }
-pub struct SessionObject {
+pub struct SessionObject<T> where T: SessionTrait {
     pub session: Session,
-    data: SessionData,
+    pub data: T,
 }
 
-impl SessionObject {
+impl<T> SessionObject<T> where T: SessionTrait {
     const DATA_KEY: &'static str = "data";
 
-    pub async fn set_user_id(&mut self, user_id: String) {
-        self.data.user_id = Some(user_id);
+    pub async fn update(&mut self) {
         Self::update_session(&self.session, &self.data).await;
     }
 
-    async fn update_session(session: &Session, session_data: &SessionData) {
+    pub async fn update_key(&mut self, key: String) {
+        self.data.set_key(key);
+        self.update().await;
+    }
+
+    async fn update_session(session: &Session, session_data: &T) {
        match session
             .insert(Self::DATA_KEY, session_data)
             .await {
@@ -52,35 +76,28 @@ impl SessionObject {
         };
     }
 
-    pub fn has_user_id(&self) -> bool {
-        self.data.user_id.is_some()
-    }
-
-    pub fn get_user_id(&self) -> String {
-        self.data.user_id.clone().expect("no user_id found")
-    }
-
     pub async fn clear(&mut self) {
-        self.data = SessionData::default();
+        self.data = T::default();
         self.session.clear().await;
     }
 }
 
-impl<S> FromRequestParts<S> for SessionObject
+impl<S, T> FromRequestParts<S> for SessionObject<T>
 where
     S: Send + Sync,
+    T: SessionTrait,
 {
     type Rejection = (StatusCode, &'static str);
 
     async fn from_request_parts(req: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let session = Session::from_request_parts(req, state).await?;
 
-        let mut data: SessionData = session
+        let data: T = session
             .get(Self::DATA_KEY)
             .await
             .expect("session data not found")
             .unwrap_or_default();
-        data.end_at = OffsetDateTime::now_utc();
+
         Self::update_session(&session, &data).await;
         Ok(Self { session, data })
     }

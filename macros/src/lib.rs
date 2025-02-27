@@ -9,13 +9,14 @@ use models::RouterAttributes;
 ///
 /// # Arguments
 ///
-/// * `state` - Application state.
-/// * `base_path` - the base path of these routes (must start with "/").
+/// * `state` - Application state. Optional and set to `()` by default.
+/// * `session_type` - the type of the session data. Optional and set to `SessionData` by default.
+/// * `base_path` - the base path of these routes (must start with "/"). Optional and set to `""` by default.
 ///
 /// # Example
 ///
 /// ```rust
-/// #[router(state=AppState, base_path="/path")]
+/// #[router(state=AppState, session_type=SessionData, base_path="/path")]
 /// impl MyRouter {
 ///     // implementation
 /// }

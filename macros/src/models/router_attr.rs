@@ -3,6 +3,7 @@ use syn::parse::{Parse, ParseStream};
 #[derive(Debug, Clone, Default)]
 pub struct RouterAttributes {
     pub state: Option<syn::Type>,
+    pub session_type: Option<syn::Type>,
     pub base_path: Option<String>,
 }
 
@@ -16,6 +17,11 @@ impl Parse for RouterAttributes {
                     let _: syn::Token![=] = input.parse()?;
                     let state: syn::Type = input.parse()?;
                     router_attr.state = Some(state);
+                }
+                "session_type" => {
+                    let _: syn::Token![=] = input.parse()?;
+                    let session_type: syn::Type = input.parse()?;
+                    router_attr.session_type = Some(session_type);
                 }
                 "base_path" => {
                     let _: syn::Token![=] = input.parse()?;

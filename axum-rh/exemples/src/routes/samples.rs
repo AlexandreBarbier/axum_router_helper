@@ -2,7 +2,7 @@ use axum::extract::Path;
 use axum::http::HeaderMap;
 use axum_rh::{
     macros::{get, post, router},
-    router::models::ApiResponse,
+    router::{models::ApiResponse, utils::session_manager::{SessionData, SessionObject, SessionTrait}},
 };
 use serde_json::json;
 pub struct Samples;
@@ -11,9 +11,10 @@ pub struct Samples;
 pub struct SampleData {
     pub id: i32,
     pub name: String,
+    pub session_key: Option<String>,
 }
 
-#[router(base_path = "/samples")]
+#[router(session_type=SessionData, base_path = "/samples")]
 impl Samples {
     #[get("")]
     async fn get_samples() -> ApiResponse<serde_json::Value> {
@@ -21,6 +22,7 @@ impl Samples {
             .map(|i| SampleData {
                 id: i,
                 name: format!("Sample {}", i),
+                ..Default::default()
             })
             .collect();
         ApiResponse::ok(Some(json!(samples)))
@@ -31,6 +33,7 @@ impl Samples {
         let sample = SampleData {
             id: id,
             name: "Sample".to_string(),
+            ..Default::default()
         };
         ApiResponse::ok(Some(sample))
     }
@@ -40,6 +43,7 @@ impl Samples {
         let sample = SampleData {
             id: id,
             name: "Sample".to_string(),
+            ..Default::default()
         };
         let mut res = ApiResponse::ok(Some(sample));
         res.headers = Some(HeaderMap::from_iter(vec![
@@ -49,5 +53,20 @@ impl Samples {
             ),
         ]));
         res
+    }
+
+    #[get("/{id}")]
+    async fn get_sample(mut session: SessionObject<SessionData>, Path(id): Path<i32>) -> ApiResponse<SampleData> {
+        println!("Session: {:?}", session.data.has_key());
+        println!("Session key: {:?}", session.session);
+        let sample = SampleData {
+            id: id,
+            name: "Sample".to_string(),
+            session_key: session.data.key(),
+        };
+        if session.data.key().is_none() {
+            session.update_key("123".to_string()).await;
+        }
+        ApiResponse::ok(Some(sample))
     }
 }
