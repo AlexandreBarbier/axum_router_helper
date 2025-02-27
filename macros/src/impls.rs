@@ -11,6 +11,9 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
 
     let mut endpoints: Vec<proc_macro2::TokenStream> = Vec::new();
     let state = router_attr.state.unwrap_or(syn::parse_quote!(()));
+    let session_data = router_attr
+        .session_type
+        .unwrap_or(syn::parse_quote!(SessionData));
     for it in parsed_item.items.iter() {
         let func = match it {
             syn::ImplItem::Fn(m) => m,
@@ -64,10 +67,10 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
 
     let k: proc_macro2::TokenStream = quote!(
         use axum_rh::router::models::Endpoint;
-        use axum_rh::router::traits::ApiRouter;
+        use axum_rh::router::traits::ArhRouter;
         #parsed_item
 
-        impl ApiRouter<#state> for #struct_name {
+        impl ArhRouter<#state, #session_data> for #struct_name {
             fn endpoints() -> Vec<Endpoint<#state>> {
                 #end_quote
             }
@@ -94,7 +97,7 @@ pub fn router_helper_derive(input: ItemStruct) -> TokenStream {
     let state: syn::Type = router_config.state_type;
     let routers = router_config.routers;
     let expanded = quote! {
-        use axum_rh::router::traits::{ApiRouter, RouterHelper};
+        use axum_rh::router::traits::{ArhRouter, RouterHelper};
 
         impl RouterHelper<#state> for #struct_name {
             fn load_routers() -> axum::Router<#state> {
