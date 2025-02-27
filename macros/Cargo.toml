@@ -4,7 +4,8 @@ version = "0.1.2"
 edition = "2021"
 description = "Macros for axum-router-helper"
 license = "MIT"
-repository = "https://github.com/AlexandreBarbier/axum_router_helper/src/router/macros"
+repository = "https://github.com/AlexandreBarbier/axum_router_helper/macros"
+
 [lib]
 proc-macro = true
 
