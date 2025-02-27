@@ -2,9 +2,9 @@ name: Rust
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["feat-publish-action"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["feat-publish-action"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -13,19 +13,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions-rs/toolchain@v1
-      with:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
           toolchain: stable
           override: true
-    - uses: katyo/publish-crates@v2
-      with:
-          path: './src/router/macros'
+      - uses: katyo/publish-crates@v2
+        with:
+          path: "./src/router/macros"
           dry-run: true
-    - uses: actions-rs/toolchain@v1
-      with:
+      - uses: actions-rs/toolchain@v1
+        with:
           toolchain: stable
           override: true
-    - uses: katyo/publish-crates@v2
-      with:
+      - uses: katyo/publish-crates@v2
+        with:
           dry-run: true
