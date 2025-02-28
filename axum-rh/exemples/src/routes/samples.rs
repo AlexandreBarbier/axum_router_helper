@@ -2,7 +2,7 @@ use axum::extract::Path;
 use axum::http::HeaderMap;
 use axum_rh::{
     macros::{get, post, router},
-    router::models::ApiResponse,
+    router::{models::ApiResponse, utils::session_manager::SessionObject},
 };
 use serde_json::json;
 pub struct Samples;
@@ -49,5 +49,15 @@ impl Samples {
             ),
         ]));
         res
+    }
+    #[get("/{id}")]
+    async fn get_sample(mut session: SessionObject, Path(id): Path<i32>) -> ApiResponse<SampleData> {
+        println!("Session: {:?}", session.has_user_id());
+        session.set_user_id(1.to_string()).await;
+        let sample = SampleData {
+            id: id,
+            name: "Sample".to_string(),
+        };
+        ApiResponse::ok(Some(sample))
     }
 }
