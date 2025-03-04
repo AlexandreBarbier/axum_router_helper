@@ -26,7 +26,7 @@ use axum_rh::router::middlewares;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     init_logger();
     let tcp = TcpListener::bind(&"0.0.0.0:3005").await.unwrap();
-    let app = ExempleApiRouter::load_routers().layer(from_fn(
+    let app = ApiRouter::load_routers().layer(from_fn(
             middlewares::logging::logging_middleware,
         ));
     serve(tcp, app.into_make_service()).await?;
@@ -51,7 +51,7 @@ To declare a router, use the `RouterHelper` derive macro and the `router_config`
 ```rust
 #[derive(RouterHelper)]
 #[router_config((), Health, Samples)]
-pub struct ExempleApiRouter;
+pub struct ApiRouter;
 ```
 
 ### Use States
@@ -65,7 +65,7 @@ pub struct ApiState {
 
 #[derive(RouterHelper)]
 #[router_config(ApiState, Health, Samples)]
-pub struct ExempleApiRouter;
+pub struct ApiRouter;
 ```
 
 ### Declare Endpoints

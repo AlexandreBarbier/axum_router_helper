@@ -1,11 +1,11 @@
 use crate::router::utils::{self, session_manager::SessionObject};
 use axum::{body::Body, http};
 
-pub async fn auth_middleware(
-    mut session: SessionObject,
+pub async fn auth_middleware<T>(
+    mut session: SessionObject<T>,
     req: axum::http::Request<Body>,
     next: axum::middleware::Next,
-) -> axum::http::Response<Body> {
+) -> axum::http::Response<Body> where T: utils::session_manager::SessionTrait {
     let token = match req
         .headers()
         .get(http::header::AUTHORIZATION)
@@ -19,15 +19,16 @@ pub async fn auth_middleware(
                 .expect("failed to build response");
         }
     };
-    if session.has_user_id() {
+    if session.data.key().is_some() && utils::auth::decode_jwt(token.to_string()).is_ok() {
         return next.run(req).await;
     }
 
     let token = token.split(' ').collect::<Vec<&str>>()[1];
+
     match utils::auth::decode_jwt(token.to_string()) {
         Ok(decoded_token) => {
             let user_id = decoded_token.claims.clone().user_id;
-            session.set_user_id(user_id.clone()).await;
+            session.data.set_key(user_id.clone());
         }
         Err(e) => {
             log::error!("Error decoding token: {:?}", e);

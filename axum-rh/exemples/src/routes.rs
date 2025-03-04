@@ -13,4 +13,4 @@ use samples::Samples;
 
 #[derive(RouterHelper)]
 #[router_config((), Health, Samples)]
-pub struct ExempleApiRouter;
+pub struct ApiRouter;

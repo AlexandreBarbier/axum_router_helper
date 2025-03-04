@@ -5,7 +5,7 @@ use tokio::task::JoinHandle;
 use tower_sessions::{Expiry, MemoryStore, SessionManagerLayer};
 use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
 
-pub async fn get_redis_session_layer(expiry: Option<i64>) -> (
+pub async fn redis(expiry: Option<i64>) -> (
     SessionManagerLayer<RedisStore<Pool>>,
     JoinHandle<Result<(), Error>>,
 ) {
@@ -25,7 +25,7 @@ pub async fn get_redis_session_layer(expiry: Option<i64>) -> (
     (session_layer, redis_conn)
 }
 
-pub async fn get_in_memory_session_layer(expiry: Option<i64>) -> SessionManagerLayer<MemoryStore> {
+pub async fn in_memory(expiry: Option<i64>) -> SessionManagerLayer<MemoryStore> {
     let expiry = expiry.unwrap_or(3600);
     let session_store = MemoryStore::default();
     SessionManagerLayer::new(session_store)
