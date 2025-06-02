@@ -16,19 +16,18 @@ impl Parse for EndpointAttributes {
                 ep_attr.path = path.value();
             } else {
                 let ident: syn::Ident = input.parse()?;
+                let _: syn::Token![=] = input.parse()?;
                 match ident.to_string().as_str() {
                     "path" => {
-                        let _: syn::Token![=] = input.parse()?;
                         let path: syn::LitStr = input.parse()?;
                         ep_attr.path = path.value();
                     }
                     "auth" => {
-                        let _: syn::Token![=] = input.parse()?;
                         let auth: syn::LitBool = input.parse()?;
                         ep_attr.auth = auth.value;
                     }
                     _ => {
-                        println!("Unknown attribute: {}", ident.to_string());
+                        println!("Unknown attribute: {}", ident);
                     }
                 }
             }

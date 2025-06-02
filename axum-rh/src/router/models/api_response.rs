@@ -75,12 +75,7 @@ where
     T: Serialize + Default,
 {
     fn into_response(self) -> axum::response::Response {
-        (
-            self.status,
-            self.headers.unwrap_or(HeaderMap::new()),
-            self.body,
-        )
-            .into_response()
+        (self.status, self.headers.unwrap_or_default(), self.body).into_response()
     }
 }
 

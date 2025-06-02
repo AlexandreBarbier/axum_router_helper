@@ -4,5 +4,5 @@ members = ["axum-rh", "macros", "axum-rh/exemples"]
 
 
 [workspace.dependencies]
-log = { version = "0.4.26", features = ["kv"] }
-axum = { version = "0.8.1", features = ["default", "macros"] }
+log = { version = "0.4.27", features = ["kv"] }
+axum = { version = "0.8.4", features = ["default", "macros"] }

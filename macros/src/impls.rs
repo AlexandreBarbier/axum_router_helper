@@ -19,7 +19,7 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
             syn::ImplItem::Fn(m) => m,
             _ => continue,
         };
-        if func.attrs.len() == 0 {
+        if func.attrs.is_empty() {
             continue;
         }
 
@@ -27,7 +27,7 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
             let method = attr
                 .path()
                 .get_ident()
-                .expect(format!("method not found for {:?}", attr).as_str())
+                .unwrap_or_else(|| panic!("method not found for {:?}", attr))
                 .to_string()
                 .as_str()
                 .to_lowercase();
@@ -48,7 +48,7 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
                     .span()
                     .source_text()
                     .unwrap_or_default(),
-                func.sig.ident.to_string()
+                func.sig.ident
             );
 
             endpoints.push(value_for_endpoint(
@@ -82,6 +82,14 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
 
 pub fn router_helper_derive(input: ItemStruct) -> TokenStream {
     let struct_name = &input.ident;
+    if input.attrs.is_empty() {
+        return syn::Error::new(
+            struct_name.span(),
+            "RouterHelper derive macro requires at least one attribute",
+        )
+        .to_compile_error()
+        .into();
+    }
     let router_config = match input.attrs[0].meta.require_list() {
         Ok(v) => match v.parse_args::<RouterConfiguration>() {
             Ok(rc) => rc,

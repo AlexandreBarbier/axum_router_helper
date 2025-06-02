@@ -5,11 +5,13 @@ use tokio::task::JoinHandle;
 use tower_sessions::{Expiry, MemoryStore, SessionManagerLayer};
 use tower_sessions_redis_store::{fred::prelude::*, RedisStore};
 
-pub async fn redis(expiry: Option<i64>) -> (
+pub async fn redis(
+    expiry: Option<i64>,
+) -> (
     SessionManagerLayer<RedisStore<Pool>>,
     JoinHandle<Result<(), Error>>,
 ) {
-    if let Err(_) = env::var("REDIS_URL") {
+    if env::var("REDIS_URL").is_err() {
         info!("REDIS_URL must be set");
     }
     let expiry = expiry.unwrap_or(3600);

@@ -1,6 +1,6 @@
 [package]
 name = "arh-macros"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 description = "Macros for axum-router-helper"
 license = "MIT"
@@ -10,8 +10,8 @@ repository = "https://github.com/AlexandreBarbier/axum_router_helper/macros"
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "1.0.94"
+proc-macro2 = "1.0.95"
 quote = "1.0.40"
-syn = { version = "2.0.100", features = ["full"] }
+syn = { version = "2.0.101", features = ["full"] }
 log = { workspace = true, features = ["kv"] }
 axum = { workspace = true, features = ["default", "ws", "macros"] }

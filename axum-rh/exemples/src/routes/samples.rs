@@ -2,7 +2,10 @@ use axum::extract::Path;
 use axum::http::HeaderMap;
 use axum_rh::{
     macros::{get, post, router},
-    router::{models::ApiResponse, utils::session_manager::{SessionData, SessionObject, SessionTrait}},
+    router::{
+        models::ApiResponse,
+        utils::session_manager::{SessionData, SessionObject, SessionTrait},
+    },
 };
 use serde_json::json;
 pub struct Samples;
@@ -31,7 +34,7 @@ impl Samples {
     #[post("/{id}")]
     async fn post_samples(Path(id): Path<i32>) -> ApiResponse<SampleData> {
         let sample = SampleData {
-            id: id,
+            id,
             name: "Sample".to_string(),
             ..Default::default()
         };
@@ -41,26 +44,27 @@ impl Samples {
     #[post("/{id}/header")]
     async fn post_samples_header(Path(id): Path<i32>) -> ApiResponse<SampleData> {
         let sample = SampleData {
-            id: id,
+            id,
             name: "Sample".to_string(),
             ..Default::default()
         };
         let mut res = ApiResponse::ok(Some(sample));
-        res.headers = Some(HeaderMap::from_iter(vec![
-            (
-                axum::http::header::SET_COOKIE,
-                "session=; HttpOnly; Max-Age=0; Path=/".parse().unwrap(),
-            ),
-        ]));
+        res.headers = Some(HeaderMap::from_iter(vec![(
+            axum::http::header::SET_COOKIE,
+            "session=; HttpOnly; Max-Age=0; Path=/".parse().unwrap(),
+        )]));
         res
     }
 
     #[get("/{id}")]
-    async fn get_sample(mut session: SessionObject<SessionData>, Path(id): Path<i32>) -> ApiResponse<SampleData> {
-        println!("Session: {:?}", session.data.has_key());
-        println!("Session key: {:?}", session.session);
+    async fn get_sample(
+        mut session: SessionObject<SessionData>,
+        Path(id): Path<i32>,
+    ) -> ApiResponse<SampleData> {
+        log::info!("Session: {:?}", session.data.has_key());
+        log::info!("Session key: {:?}", session.session);
         let sample = SampleData {
-            id: id,
+            id,
             name: "Sample".to_string(),
             session_key: session.data.key(),
         };
