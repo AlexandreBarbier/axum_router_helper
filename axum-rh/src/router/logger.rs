@@ -137,7 +137,8 @@ pub fn init_remote_logger(with_better_stack: bool) {
 
 pub fn send_to_better_stack(message: LoggingInfo) {
     let buf = rmp_serde::encode::to_vec(&serde_json::json!(message)).unwrap();
-    let _ = ureq::post("https://in.logs.betterstack.com")
+    let url = std::env::var("BETTERSTACK_URL").expect("BETTERSTACK_URL is needed");
+    let _ = ureq::post(url.as_str())
         .header("Content-Type", "application/msgpack")
         .header("Accept", "application/json, text/plain")
         .header(
