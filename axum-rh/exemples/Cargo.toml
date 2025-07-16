@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokio = "1.45.1"
+tokio = "1.46.1"
 axum-rh = { path = "../", features = ["base"] }
 axum = "0.8.4"
 serde = "1.0.219"

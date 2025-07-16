@@ -79,6 +79,78 @@ pub fn init_logger() {
         .init();
 }
 
+pub fn init_remote_logger(with_better_stack: bool) {
+    std::env::var("BETTERSTACK_API_KEY").expect("BETTERSTACK_API_KEY is needed");
+    let (tx, rx) = std::sync::mpsc::channel::<LoggingInfo>();
+    if with_better_stack && std::env::var("BETTERSTACK_API_KEY").is_ok() {
+        tokio::spawn(async move {
+            for receive in rx {
+                send_to_better_stack(receive);
+            }
+        });
+    }
+    env_logger::builder()
+        .format(move |buf, record| {
+            let datetime: DateTime<Utc> = SystemTime::now().into();
+            let file_line = match (record.file(), record.line()) {
+                (Some(file), Some(line)) if record.level() == log::Level::Error => {
+                    format!(" -{file} {line}-")
+                }
+                _ => String::new(),
+            };
+            let level = record.level().to_string();
+            let args = format!("{}", record.args());
+            let mut params = LoggingVisitor::default();
+            let _ = record.key_values().visit(&mut params);
+            if with_better_stack && std::env::var("BETTERSTACK_API_KEY").is_ok() {
+                let _ = tx.send(LoggingInfo {
+                    level,
+                    dt: datetime.to_string(),
+                    message: args.clone(),
+                    params: params.clone(),
+                });
+            }
+            let mut message = "".to_string();
+            if let Some(method) = params.clone().method {
+                message += method.as_str();
+                message += " ";
+            }
+
+            if params.status.unwrap_or_default() != 0 {
+                let status = params.status.unwrap();
+                message += status.to_string().as_str();
+                message += " ";
+            }
+
+            message += &args;
+            writeln!(
+                buf,
+                "{} [{}] {} {}",
+                datetime.format("%T %D"),
+                record.level(),
+                file_line,
+                message
+            )
+        })
+        .init();
+}
+
+pub fn send_to_better_stack(message: LoggingInfo) {
+    let buf = rmp_serde::encode::to_vec(&serde_json::json!(message)).unwrap();
+    let _ = ureq::post("https://in.logs.betterstack.com")
+        .header("Content-Type", "application/msgpack")
+        .header("Accept", "application/json, text/plain")
+        .header(
+            "Authorization",
+            format!(
+                "Bearer {}",
+                std::env::var("BETTERSTACK_API_KEY").expect("BETTERSTACK_API_KEY must be set")
+            )
+            .as_str(),
+        )
+        .send(&buf);
+}
+
 pub fn get_log_format() -> &'static str {
     "%s %r - %{r}a %Dms"
 }
