@@ -196,7 +196,7 @@ dependencies = [
 
 [[package]]
 name = "axum-rh"
-version = "0.1.8"
+version = "0.1.9"
 dependencies = [
  "arh-macros",
  "axum",

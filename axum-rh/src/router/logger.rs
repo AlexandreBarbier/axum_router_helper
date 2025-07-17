@@ -1,6 +1,7 @@
 use chrono::{offset::Utc, DateTime};
 use log::kv::{Key, VisitSource};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::io::Write;
 use std::time::SystemTime;
 
@@ -22,6 +23,8 @@ pub struct LoggingVisitor {
     pub status: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub others: Option<HashMap<String, String>>,
 }
 
 impl<'kvs> VisitSource<'kvs> for LoggingVisitor {
@@ -43,7 +46,16 @@ impl<'kvs> VisitSource<'kvs> for LoggingVisitor {
             "method" => {
                 self.method = Some(value.to_string());
             }
-            _ => {}
+
+            _ => {
+                if self.others.is_none() {
+                    self.others = Some(HashMap::new());
+                }
+                self.others
+                    .as_mut()
+                    .unwrap()
+                    .insert(key.as_str().to_string(), value.to_string());
+            }
         };
         Ok(())
     }
