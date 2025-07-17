@@ -91,7 +91,7 @@ pub fn init_logger() {
         .init();
 }
 
-pub fn init_remote_logger(with_better_stack: bool) {
+pub fn init_remote_logger(with_better_stack: bool, global_params: Option<HashMap<String, String>>) {
     std::env::var("BETTERSTACK_API_KEY").expect("BETTERSTACK_API_KEY is needed");
     let (tx, rx) = std::sync::mpsc::channel::<LoggingInfo>();
     if with_better_stack && std::env::var("BETTERSTACK_API_KEY").is_ok() {
@@ -113,6 +113,14 @@ pub fn init_remote_logger(with_better_stack: bool) {
             let level = record.level().to_string();
             let args = format!("{}", record.args());
             let mut params = LoggingVisitor::default();
+            if let Some(global_params) = &global_params {
+                for (key, value) in global_params {
+                    params
+                        .others
+                        .get_or_insert_with(HashMap::new)
+                        .insert(key.clone(), value.clone());
+                }
+            }
             let _ = record.key_values().visit(&mut params);
             if with_better_stack && std::env::var("BETTERSTACK_API_KEY").is_ok() {
                 let _ = tx.send(LoggingInfo {
