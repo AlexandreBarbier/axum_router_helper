@@ -24,7 +24,7 @@ pub struct LoggingVisitor {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub others: Option<HashMap<String, String>>,
+    pub context: Option<HashMap<String, String>>,
 }
 
 impl<'kvs> VisitSource<'kvs> for LoggingVisitor {
@@ -48,10 +48,10 @@ impl<'kvs> VisitSource<'kvs> for LoggingVisitor {
             }
 
             _ => {
-                if self.others.is_none() {
-                    self.others = Some(HashMap::new());
+                if self.context.is_none() {
+                    self.context = Some(HashMap::new());
                 }
-                self.others
+                self.context
                     .as_mut()
                     .unwrap()
                     .insert(key.as_str().to_string(), value.to_string());
@@ -116,7 +116,7 @@ pub fn init_remote_logger(with_better_stack: bool, global_params: Option<HashMap
             if let Some(global_params) = &global_params {
                 for (key, value) in global_params {
                     params
-                        .others
+                        .context
                         .get_or_insert_with(HashMap::new)
                         .insert(key.clone(), value.clone());
                 }
