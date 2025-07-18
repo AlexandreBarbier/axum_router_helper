@@ -5,7 +5,10 @@ pub async fn auth_middleware<T>(
     mut session: SessionObject<T>,
     req: axum::http::Request<Body>,
     next: axum::middleware::Next,
-) -> axum::http::Response<Body> where T: utils::session_manager::SessionTrait {
+) -> axum::http::Response<Body>
+where
+    T: utils::session_manager::SessionTrait,
+{
     let token = match req
         .headers()
         .get(http::header::AUTHORIZATION)
@@ -28,10 +31,10 @@ pub async fn auth_middleware<T>(
     match utils::auth::decode_jwt(token.to_string()) {
         Ok(decoded_token) => {
             let user_id = decoded_token.claims.clone().user_id;
-            session.data.set_key(user_id.clone());
+            session.update_key(user_id.clone()).await;
         }
         Err(e) => {
-            log::error!("Error decoding token: {:?}", e);
+            log::error!("Error decoding token: {e:?}");
             return axum::http::Response::builder()
                 .status(401)
                 .body(Body::empty())

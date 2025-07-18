@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tower_sessions::Session;
 
-
 pub trait SessionTrait: Send + Sync + Serialize + for<'de> Deserialize<'de> + Default {
     fn key(&self) -> Option<String>;
     fn set_key(&mut self, key: String);
@@ -14,7 +13,6 @@ pub trait SessionTrait: Send + Sync + Serialize + for<'de> Deserialize<'de> + De
         self.key().is_some()
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SessionData {
@@ -42,12 +40,18 @@ impl Default for SessionData {
         }
     }
 }
-pub struct SessionObject<T> where T: SessionTrait {
+pub struct SessionObject<T>
+where
+    T: SessionTrait,
+{
     pub session: Session,
     pub data: T,
 }
 
-impl<T> SessionObject<T> where T: SessionTrait {
+impl<T> SessionObject<T>
+where
+    T: SessionTrait,
+{
     const DATA_KEY: &'static str = "data";
 
     pub async fn update(&mut self) {
@@ -60,9 +64,7 @@ impl<T> SessionObject<T> where T: SessionTrait {
     }
 
     async fn update_session(session: &Session, session_data: &T) {
-       match session
-            .insert(Self::DATA_KEY, session_data)
-            .await {
+        match session.insert(Self::DATA_KEY, session_data).await {
             Ok(_) => {}
             Err(e) => {
                 log::error!("Error updating session: {:?}", e);
