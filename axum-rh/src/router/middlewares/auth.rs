@@ -37,8 +37,7 @@ where
 
     match utils::auth::decode_jwt(token.to_string()) {
         Ok(decoded_token) => {
-            let user_id = decoded_token.claims.clone().user_id;
-            session.update_key(user_id.clone()).await;
+            session.update_key(decoded_token.claims.user_id).await;
         }
         Err(e) => {
             log::error!("Error decoding token: {e:?}");
