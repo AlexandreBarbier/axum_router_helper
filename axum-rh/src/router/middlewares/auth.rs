@@ -26,7 +26,14 @@ where
         return next.run(req).await;
     }
 
-    let token = token.split(' ').collect::<Vec<&str>>()[1];
+    let token = token.split(' ').collect::<Vec<&str>>();
+    if token.len() != 2 || token[0] != "Bearer" {
+        return axum::http::Response::builder()
+            .status(401)
+            .body(Body::empty())
+            .expect("failed to build response");
+    }
+    let token = token[1];
 
     match utils::auth::decode_jwt(token.to_string()) {
         Ok(decoded_token) => {
