@@ -27,7 +27,7 @@ pub fn router(router_attr: RouterAttributes, parsed_item: ItemImpl) -> TokenStre
             let method = attr
                 .path()
                 .get_ident()
-                .unwrap_or_else(|| panic!("method not found for {:?}", attr))
+                .unwrap_or_else(|| panic!("method not found for {attr:?}"))
                 .to_string()
                 .as_str()
                 .to_lowercase();
@@ -105,11 +105,13 @@ pub fn router_helper_derive(input: ItemStruct) -> TokenStream {
     let state: syn::Type = router_config.state_type;
     let routers = router_config.routers;
     let expanded = quote! {
-        use axum_rh::router::traits::{ArhRouter, RouterHelper};
+        use axum_rh::router::traits::{ArhRouter, RouterHelper, Routers};
 
         impl RouterHelper<#state> for #struct_name {
-            fn load_routers() -> axum::Router<#state> {
-                load_routers!(#(#routers),*)
+            fn load_routers() -> Routers<#state> {
+                let open_router = load_routers!(#(#routers),*);
+                let protected_router = load_auth_routers!(#(#routers),*);
+                Routers { open_router, protected_router}
             }
 
             fn load_routers_with_auth() -> axum::Router<#state> {
