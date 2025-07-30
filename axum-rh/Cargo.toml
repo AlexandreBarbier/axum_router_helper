@@ -1,6 +1,6 @@
 [package]
 name = "axum-rh"
-version = "0.2.5"
+version = "0.2.6"
 edition = "2021"
 description = "A helper library for the axum router"
 license = "MIT"

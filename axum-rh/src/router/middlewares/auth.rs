@@ -9,7 +9,6 @@ pub async fn auth_middleware<T>(
 where
     T: utils::session_manager::SessionTrait,
 {
-    println!("auth_middleware called");
     let token = match req
         .headers()
         .get(http::header::AUTHORIZATION)
