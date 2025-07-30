@@ -34,5 +34,18 @@ cfg_if::cfg_if! {
             }
         };
         }
+
+        #[macro_export]
+        macro_rules! load_auth_routers {
+        ($($router:ident), +) => {
+            {
+                let mut router = axum::Router::new();
+                $(
+                    router = router.merge($router::auth_router());
+                )+
+                router
+            }
+        };
+        }
     }
 }

@@ -111,6 +111,11 @@ pub fn router_helper_derive(input: ItemStruct) -> TokenStream {
             fn load_routers() -> axum::Router<#state> {
                 load_routers!(#(#routers),*)
             }
+
+            fn load_routers_with_auth() -> axum::Router<#state> {
+                load_auth_routers!(#(#routers),*)
+            }
+
         }
     };
     TokenStream::from(expanded)

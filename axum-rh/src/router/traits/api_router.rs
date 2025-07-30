@@ -1,9 +1,6 @@
-use axum::{middleware::from_fn, Router};
+use axum::Router;
 
-use crate::router::{
-    middlewares::auth::auth_middleware, models::endpoint::Endpoint,
-    utils::session_manager::SessionTrait,
-};
+use crate::router::{models::endpoint::Endpoint, utils::session_manager::SessionTrait};
 
 pub trait ArhRouter<T, A>
 where
@@ -17,14 +14,20 @@ where
     fn router() -> axum::Router<T> {
         Self::endpoints()
             .into_iter()
+            .filter(|x| !x.authenticated)
             .fold(Router::new(), |router, endpoint| {
                 let path = endpoint.path;
-                match endpoint.authenticated {
-                    true => {
-                        router.route(path, endpoint.handler.layer(from_fn(auth_middleware::<A>)))
-                    }
-                    false => router.route(path, endpoint.handler),
-                }
+                router.route(path, endpoint.handler)
+            })
+    }
+
+    fn auth_router() -> axum::Router<T> {
+        Self::endpoints()
+            .into_iter()
+            .filter(|x| x.authenticated)
+            .fold(Router::new(), |router, endpoint| {
+                let path = endpoint.path;
+                router.route(path, endpoint.handler)
             })
     }
 }

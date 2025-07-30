@@ -1,7 +1,7 @@
 pub mod health;
 pub mod samples;
 use axum_rh::{
-    load_routers,
+    load_auth_routers, load_routers,
     macros::{router_config, RouterHelper},
 };
 
