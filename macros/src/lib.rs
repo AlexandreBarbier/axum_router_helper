@@ -50,7 +50,7 @@ pub fn router(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     // fields
 /// }
 /// ```
-#[proc_macro_derive(RouterHelper, attributes(router))]
+#[proc_macro_derive(RouterHelper, attributes(router_config))]
 pub fn router_helper_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as syn::ItemStruct);
     impls::router_helper_derive(input)
